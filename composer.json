@@ -1,0 +1,13 @@
+{
+  "name": "drupal/access_latest",
+  "type": "drupal-module",
+  "description": "This module provides the editor with a link they can share to give the reviewer access to the Latest revision page.",
+  "license": "GPL-2.0-or-later",
+  "repositories": [
+    {
+      "type": "composer",
+      "url": "https://packages.drupal.org/8"
+    }
+  ],
+  "require": {}
+}
