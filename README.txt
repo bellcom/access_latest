@@ -9,3 +9,7 @@ This module provides the editor with a link they can share to give the reviewer 
 Find the link on the 'Moderation Control' form when viewing the moderated entity's Latest version page. (Make sure Moderation Control is displayed in the bundle's Manage Display settings.)
 
 The link is a hash that stays the same for each page, so if the editor makes more edits the reviewer will always have access to see the latest version of that page. The links do not expire, so this is not a high-security solution if your unpublished drafts need protection.
+
+
+Origin : https://git.drupalcode.org/sandbox/lynn-2973708
+
