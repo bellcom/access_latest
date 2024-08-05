@@ -1,0 +1,52 @@
+<?php
+
+use Drupal\Component\Utility\Crypt;
+use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\Site\Settings;
+use Drupal\Core\Url;
+
+/**
+ * Implements form_FORM_ID_alter().
+ */
+function access_latest_form_content_moderation_entity_moderation_form_alter(&$form, $form_state) {
+  $entity = array_shift($form_state->getBuildInfo()['args']);
+
+  $moderation_info = Drupal::service('content_moderation.moderation_information');
+  if ($moderation_info->hasPendingRevision($entity)) {
+    $route = 'entity.' . $entity->getEntityTypeId() . '.latest_version';
+  }
+  else {
+    $route = 'entity.' . $entity->getEntityTypeId() . '.canonical';
+  }
+
+  $url = Url::fromRoute($route,
+    [$entity->getEntityTypeId() => $entity->id()], 
+    [
+      'absolute' => TRUE, 
+      'query' => ['access_latest' => Crypt::hashBase64($entity->id() . Settings::getHashSalt())],
+    ])->toString();
+
+
+  $form['access_latest'] = [
+    '#type' => 'textfield',
+    '#default_value' => $url,
+    '#access' => \Drupal::currentUser()->hasPermission('view latest version'),
+    '#title' => 'Latest version access',
+    '#description' => 'Copy this URL and share with reviewers to allow them to view the Latest version without logging in.',
+  ];
+}
+
+/**
+ * Implements hook_entity_access().
+ * Allows requests with tokens to view the entity.
+ */
+function access_latest_entity_access(EntityInterface $entity, $operation, AccountInterface $account) {
+  if ($operation == 'view') {
+    $token = \Drupal::request()->query->get('access_latest');
+    if ($token && $token == Crypt::hashBase64($entity->id() . Settings::getHashSalt())) {
+      return AccessResult::allowed();
+    }
+  }
+}
